@@ -1,0 +1,8 @@
+# https://docs.awesomeapi.com.br/api-de-moedas
+@moedes=USD-BRL,EUR-BRL,BTC-BRL
+get https://economia.awesomeapi.com.br/json/last/{{moedes}}
+Accept: application/json
+###
+
+get http://localhost:8080/cotacao
+Accept: application/json
