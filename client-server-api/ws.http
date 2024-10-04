@@ -1,6 +1,6 @@
 # https://docs.awesomeapi.com.br/api-de-moedas
-@moedes=USD-BRL,EUR-BRL,BTC-BRL
-get https://economia.awesomeapi.com.br/json/last/{{moedes}}
+@moedas=USD-BRL,EUR-BRL,BTC-BRL
+get https://economia.awesomeapi.com.br/json/last/{{moedas}}
 Accept: application/json
 ###
 
