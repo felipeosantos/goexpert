@@ -1,0 +1,12 @@
+FROM golang:latest AS builder
+WORKDIR /app
+#COPY --exclude=.env . .
+COPY . .
+RUN cd ./cmd/server && GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o app
+
+FROM scratch
+WORKDIR /app
+COPY --from=builder /app/cmd/server/app .
+EXPOSE 8080
+ENV WEATHER_API_KEY=myApiKey
+ENTRYPOINT [ "./app" ]

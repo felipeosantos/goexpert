@@ -1,0 +1,61 @@
+###
+
+GET http://localhost:8080/?cep=07000000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET http://localhost:8080/?cep=79841000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET http://localhost:8080/?cep=07050000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET http://localhost:8080/?cep=0700000A HTTP/1.1
+Accept: application/json
+
+###
+
+GET https://goclimacep-leizos6cda-uc.a.run.app/?cep=07000000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET https://goclimacep-leizos6cda-uc.a.run.app/?cep=79841000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET https://goclimacep-leizos6cda-uc.a.run.app/?cep=07050000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET https://goclimacep-leizos6cda-uc.a.run.app/?cep=0700000A HTTP/1.1
+Accept: application/json
+
+###
+
+GET http://localhost:8080/?cep=01001000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET http://localhost:8080/?cep=79002000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET https://goclimacep-leizos6cda-uc.a.run.app/?cep=01001000 HTTP/1.1
+Accept: application/json
+
+###
+
+GET https://goclimacep-leizos6cda-uc.a.run.app/?cep=79002000 HTTP/1.1
+Accept: application/json
+
+###
