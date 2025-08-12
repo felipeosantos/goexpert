@@ -2,6 +2,7 @@ package clients_test
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -46,7 +47,7 @@ func TestBuscaCEP_Success(t *testing.T) {
 		},
 	}
 
-	result, err := clients.BuscaCEP(mockClient, "01001000")
+	result, err := clients.BuscaCEP(context.Background(), mockClient, "01001000")
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "01001-000", result.Cep)
@@ -60,7 +61,7 @@ func TestBuscaCEP_HTTPClientError(t *testing.T) {
 		},
 	}
 
-	result, err := clients.BuscaCEP(mockClient, "01001000")
+	result, err := clients.BuscaCEP(context.Background(), mockClient, "01001000")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 }
@@ -75,7 +76,7 @@ func TestBuscaCEP_StatusCodeError(t *testing.T) {
 		},
 	}
 
-	result, err := clients.BuscaCEP(mockClient, "0000000")
+	result, err := clients.BuscaCEP(context.Background(), mockClient, "0000000")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 }
@@ -94,7 +95,7 @@ func TestBuscaCEP_NotFoundError(t *testing.T) {
 		},
 	}
 
-	result, err := clients.BuscaCEP(mockClient, "01000000")
+	result, err := clients.BuscaCEP(context.Background(), mockClient, "01000000")
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "true", result.Erro)

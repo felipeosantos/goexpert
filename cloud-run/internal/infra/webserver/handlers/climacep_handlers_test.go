@@ -133,6 +133,7 @@ func TestBuscaClimaCEP_Success(t *testing.T) {
 	var resp entity.ClimaResult
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
+	assert.Equal(t, "Guarulhos", resp.City)
 	assert.Equal(t, 21.1, resp.TempCelsius)
 	assert.Equal(t, 69.98, resp.TempFahrenheit)
 	assert.Equal(t, 294.25, resp.TempKelvin)

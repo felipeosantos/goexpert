@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,7 @@ import (
 	"github.com/felipeosantos/curso-go/goexpert/cloud-run/internal/entity"
 )
 
-func BuscaCurrentWeather(httpClient HTTPClient, localidade string) (*entity.CurrentWeatherResponse, *entity.WeatherErrorResponse, error) {
+func BuscaCurrentWeather(ctx context.Context, httpClient HTTPClient, localidade string) (*entity.CurrentWeatherResponse, *entity.WeatherErrorResponse, error) {
 
 	apiKey := os.Getenv("WEATHER_API_KEY") // Certifique-se de definir a variável de ambiente WEATHER_API_KEY com sua chave da API
 
@@ -23,7 +24,7 @@ func BuscaCurrentWeather(httpClient HTTPClient, localidade string) (*entity.Curr
 
 	url := fmt.Sprintf("%s?%s", baseURL, params.Encode())
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		fmt.Printf("Erro ao criar requisição para WeatherAPI: %v\n", err)
 		return nil, nil, err

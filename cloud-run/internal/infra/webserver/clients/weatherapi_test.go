@@ -2,6 +2,7 @@ package clients_test
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -82,7 +83,7 @@ func TestBuscaCurrentWeather_Success(t *testing.T) {
 		},
 	}
 
-	result, weatherErr, err := clients.BuscaCurrentWeather(mockClient, "Guarulhos")
+	result, weatherErr, err := clients.BuscaCurrentWeather(context.Background(), mockClient, "Guarulhos")
 	assert.NoError(t, err)
 	assert.Nil(t, weatherErr)
 	assert.NotNil(t, result)
@@ -100,7 +101,7 @@ func TestBuscaCurrentWeather_HTTPClientError(t *testing.T) {
 		},
 	}
 
-	result, weatherErr, err := clients.BuscaCurrentWeather(mockClient, "Guarulhos")
+	result, weatherErr, err := clients.BuscaCurrentWeather(context.Background(), mockClient, "Guarulhos")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Nil(t, weatherErr)
@@ -125,7 +126,7 @@ func TestBuscaCurrentWeather_StatusCodeError(t *testing.T) {
 		},
 	}
 
-	result, weatherErr, err := clients.BuscaCurrentWeather(mockClient, "UnknownPlace")
+	result, weatherErr, err := clients.BuscaCurrentWeather(context.Background(), mockClient, "UnknownPlace")
 	assert.NoError(t, err)
 	assert.NotNil(t, weatherErr)
 	assert.Nil(t, result)

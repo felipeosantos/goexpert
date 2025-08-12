@@ -23,6 +23,8 @@ func NewClimaCEPHandler(viaCEPClient, weatherAPIClient clients.HTTPClient) *Clim
 
 func (cch *ClimaCEPHandler) BuscaClimaCEP(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+
 	if r.URL.Path != "/" {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -41,7 +43,7 @@ func (cch *ClimaCEPHandler) BuscaClimaCEP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	cep, err := clients.BuscaCEP(cch.ViaCEPHTTPClient, cepParam)
+	cep, err := clients.BuscaCEP(ctx, cch.ViaCEPHTTPClient, cepParam)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		errorResponse := entity.ErrorResponse{
@@ -62,7 +64,7 @@ func (cch *ClimaCEPHandler) BuscaClimaCEP(w http.ResponseWriter, r *http.Request
 	}
 
 	// Buscar o clima atual usando a localidade do CEP
-	currentWeather, weatherError, err := clients.BuscaCurrentWeather(cch.WeatherAPIHTTPClient, cep.Localidade)
+	currentWeather, weatherError, err := clients.BuscaCurrentWeather(ctx, cch.WeatherAPIHTTPClient, cep.Localidade)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		errorResponse := entity.ErrorResponse{
@@ -81,6 +83,7 @@ func (cch *ClimaCEPHandler) BuscaClimaCEP(w http.ResponseWriter, r *http.Request
 	}
 	// Unificando os dados do CEP e do clima atual
 	climaResult := entity.ClimaResult{
+		City:           currentWeather.Location.Name,
 		TempCelsius:    currentWeather.Current.TempC,
 		TempFahrenheit: celsiusToFahrenheit(currentWeather.Current.TempC),
 		TempKelvin:     celsiusToKelvin(currentWeather.Current.TempC),

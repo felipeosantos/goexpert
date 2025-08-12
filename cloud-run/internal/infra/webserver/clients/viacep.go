@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,14 +11,14 @@ import (
 	"github.com/felipeosantos/curso-go/goexpert/cloud-run/internal/entity"
 )
 
-func BuscaCEP(httpClient HTTPClient, cep string) (*entity.ViaCEP, error) {
+func BuscaCEP(ctx context.Context, httpClient HTTPClient, cep string) (*entity.ViaCEP, error) {
 
 	viacepURL := &url.URL{
 		Scheme: "http",
 		Host:   "viacep.com.br",
 		Path:   fmt.Sprintf("/ws/%s/json/", url.PathEscape(cep)),
 	}
-	req, err := http.NewRequest("GET", viacepURL.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", viacepURL.String(), nil)
 	if err != nil {
 		fmt.Printf("Erro ao criar requisição para ViaCEP: %v\n", err)
 		return nil, err
