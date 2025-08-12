@@ -1,0 +1,29 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+processors:
+extensions:
+  health_check: {}
+exporters:
+  zipkin/nontls:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+  debug:
+    verbosity: detailed
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [zipkin/nontls, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: []
+      exporters: [debug]

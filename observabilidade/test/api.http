@@ -1,0 +1,67 @@
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cep": "07000000"
+}
+
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cep": "79841000"
+}
+
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cep": "07050000"
+}
+
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cep": "0700000A"
+}
+
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cep": "01001000"
+}
+
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cep": "79002000"
+}
+
+###
+
+POST http://localhost:8081/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{}

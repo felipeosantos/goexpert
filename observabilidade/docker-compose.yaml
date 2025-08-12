@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  goclimaa:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8081:8081"
+    environment:
+      - CLIMA_CEP_B_BASE_URL=http://goclimab:8080
+      - OTEL_SERVICE_NAME=serviceA
+      - OTEL_COLLECTOR_ENDPOINT=otel-collector:4317
+    depends_on:
+      - goclimab
+      - otel-collector
+  goclimab:
+    build:
+      context: ../cloud-run
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8080:8080"
+    environment:
+      - WEATHER_API_KEY=273e8921510c4e5e902182938251507
+      - OTEL_SERVICE_NAME=serviceB
+      - OTEL_COLLECTOR_ENDPOINT=otel-collector:4317
+    depends_on:
+      - otel-collector
+  # The zipkin process services the UI, and also exposes a POST endpoint that
+  # instrumentation can send trace data to.
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin-slim:${TAG:-latest}
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mem
+      # Uncomment to enable self-tracing
+      # - SELF_TRACING_ENABLED=true
+      # Uncomment to increase heap size
+      # - JAVA_OPTS=-Xms128m -Xmx128m -XX:+ExitOnOutOfMemoryError
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+    # Uncomment to enable debug logging
+    # command: --logging.level.zipkin2=DEBUG
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.131.1
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./.docker/otel-collector.yaml:/etc/otel-collector.yaml
+    ports:
+      - 4317:4317
+    depends_on:
+      - zipkin
