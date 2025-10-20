@@ -5,7 +5,7 @@ Um middleware configurável de limitação de requisições para aplicações we
 ## Funcionalidades
 
 - Limitação de requisições baseada em endereço IP
-- Limitação de requisições baseada em token de API
+- Limitação de requisições baseada em token de API, neste caso o IP também é considerado quando ocorrer um bloqueio
 - Limites de taxa e durações de bloqueio configuráveis
 - Suporte para armazenamento em Redis ou em memória
 - Fácil integração com o roteador Chi
