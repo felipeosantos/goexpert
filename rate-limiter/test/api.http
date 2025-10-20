@@ -1,0 +1,14 @@
+### Test regular request
+GET http://localhost:8080/ HTTP/1.1
+
+### Test with API key
+GET http://localhost:8080/ HTTP/1.1
+API_KEY: acb
+
+### Test a different API key
+GET http://localhost:8080/ HTTP/1.1
+API_KEY: devwas
+
+### Test a different API key
+GET http://localhost:8080/ HTTP/1.1
+API_KEY: asdqwed
