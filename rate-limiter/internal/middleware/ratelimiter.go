@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
 
 	"github.com/felipeosantos/goexpert/rate-limiter/internal/limiter"
@@ -50,6 +51,12 @@ func getIPAddress(r *http.Request) string {
 		return xff
 	}
 
-	// If not behind a proxy, use RemoteAddr
-	return r.RemoteAddr
+	// If not behind a proxy, use RemoteAddr but strip the port
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		// If there's an error splitting (perhaps because there's no port),
+		// just use the original RemoteAddr
+		return r.RemoteAddr
+	}
+	return ip
 }
