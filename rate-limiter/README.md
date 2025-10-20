@@ -1,90 +1,176 @@
-# Rate Limiter in Go
+# Limitador de Requisições em Go
 
-A configurable rate limiter middleware for Go web applications that can restrict access based on IP address or API token.
+Um middleware configurável de limitação de requisições para aplicações web em Go que pode restringir o acesso com base no endereço IP ou token de API.
 
-## Features
+## Funcionalidades
 
-- Limit requests based on IP address
-- Limit requests based on API token
-- Configurable rate limits and block durations
-- Support for Redis or in-memory storage
-- Easy integration with Chi router
-- Configuration via environment variables or .env file
+- Limitação de requisições baseada em endereço IP
+- Limitação de requisições baseada em token de API
+- Limites de taxa e durações de bloqueio configuráveis
+- Suporte para armazenamento em Redis ou em memória
+- Fácil integração com o roteador Chi
+- Configuração através de variáveis de ambiente ou arquivo .env
 
-## Configuration
+## Configuração
 
-The rate limiter can be configured using environment variables or a `.env` file:
+O limitador de requisições pode ser configurado usando variáveis de ambiente ou um arquivo `.env` com estrutura hierárquica:
 
-| Variable | Description | Default |
+Obs: As variáveis de ambiente têm precedência sobre as configurações do arquivo `.env`. Para as variáveis de ambiente substituir `.` por `_`.
+
+### Configuração do Servidor
+
+| Variável | Descrição | Padrão |
 |----------|-------------|---------|
-| SERVER_PORT | Port for the server | 8080 |
-| REDIS_URL | URL for Redis connection | redis://localhost:6379/0 |
-| STORAGE_TYPE | Storage backend (redis or memory) | redis |
-| IP_RATE_LIMIT | Requests per second allowed per IP | 10 |
-| TOKEN_RATE_LIMIT | Requests per second allowed per token | 100 |
-| BLOCK_DURATION | How long to block after limit exceeded | 5m |
-| RATE_WINDOW | Time window for rate limiting | 1s |
-| TOKEN_CONFIG_[token_name] | Token-specific rate limit and block duration | N/A |
+| SERVER_PORT | Porta para o servidor | 8080 |
 
-### Token-specific Configuration
+### Configuração de Armazenamento
 
-You can configure custom rate limits and block durations for specific tokens using the following format:
+| Variável | Descrição | Padrão |
+|----------|-------------|---------|
+| STORAGE_TYPE | Backend de armazenamento (redis ou memory) | memory |
+| STORAGE_REDIS_URL | URL para conexão com Redis | redis://localhost:6379/0 |
+| STORAGE_MEMORY_SIZE | Número máximo de entradas para armazenamento em memória | 1000 |
+
+### Configuração de Limitação por IP
+
+| Variável | Descrição | Padrão |
+|----------|-------------|---------|
+| IP_RATE_LIMIT | Requisições permitidas por IP na janela de tempo | 1 |
+| IP_RATE_WINDOW | Janela de tempo para limitação de IP | 1s |
+| IP_BLOCK_DURATION | Quanto tempo bloquear o IP após exceder o limite | 10s |
+
+### Configuração Específica por Token
+
+Configure limites de requisição personalizados para tokens específicos usando o formato hierárquico:
 
 ```
-TOKEN_CONFIG_[token_name]=[rate_limit],[block_duration]
+TOKEN.[nome_token].RATE_LIMIT=[número]
+TOKEN.[nome_token].RATE_WINDOW=[duração]
+TOKEN.[nome_token].BLOCK_DURATION=[duração]
 ```
 
-For example:
-```
-TOKEN_CONFIG_premium=200,10m  # Premium token: 200 req/s, 10 minute block
-TOKEN_CONFIG_basic=50,5m      # Basic token: 50 req/s, 5 minute block
-TOKEN_CONFIG_test=20,1m       # Test token: 20 req/s, 1 minute block
+#### Exemplos de Configuração de Token
+
+Obs: Os tokens devem estar em caixa baixa no envio das requisições.
+
+```env
+# Configuração do token "acb"
+TOKEN.ACB.RATE_LIMIT=2
+TOKEN.ACB.RATE_WINDOW=1s
+TOKEN.ACB.BLOCK_DURATION=20s
+
+# Configuração do token "devwas"
+TOKEN.DEVWAS.RATE_LIMIT=50
+TOKEN.DEVWAS.RATE_WINDOW=1s
+TOKEN.DEVWAS.BLOCK_DURATION=1m
+
+# Configuração do token "asdqwed"
+TOKEN.ASDQWED.RATE_LIMIT=20
+TOKEN.ASDQWED.RATE_WINDOW=1s
+TOKEN.ASDQWED.BLOCK_DURATION=1m
 ```
 
-## Running with Docker Compose
+### Formato de Duração
 
-To run the application with Docker Compose:
+Os valores de duração podem ser especificados usando o formato de duração do Go:
+- `s` para segundos (ex: `10s`)
+- `m` para minutos (ex: `1m`)
+- `h` para horas (ex: `1h`)
+- Formato combinado (ex: `1m30s`)
+
+## Executando a Aplicação
+
+### Desenvolvimento Local
 
 ```bash
+# Executar a aplicação
+go run cmd/server/main.go
+```
+
+### Docker Compose
+
+```bash
+# Iniciar com Redis e os contêineres da aplicação
 docker-compose up -d
 ```
 
-This will start both Redis and the application containers.
+## Testes
 
-## Testing
-
-You can test the rate limiter using the HTTP file in the `test` directory:
+Você pode testar o limitador de requisições usando o arquivo HTTP no diretório `test`:
 
 ```
 test/api.http
 ```
 
-Or using curl:
+Ou usando curl:
 
 ```bash
-# Test regular request (limited by IP)
+# Testar limitação baseada em IP
 curl http://localhost:8080/
 
-# Test with API key (limited by token)
-curl -H "API_KEY: test-token-123" http://localhost:8080/
+# Testar limitação baseada em token
+curl -H "API_KEY: acb" http://localhost:8080/
+curl -H "API_KEY: devwas" http://localhost:8080/
+curl -H "API_KEY: asdqwed" http://localhost:8080/
 
-# Send multiple requests in quick succession to trigger rate limiting
-for i in {1..20}; do curl -H "API_KEY: test-token-123" http://localhost:8080/; done
+# Disparar limitação de requisições (enviar múltiplas requisições rapidamente)
+for i in {1..5}; do curl http://localhost:8080/; done
+for i in {1..3}; do curl -H "API_KEY: acb" http://localhost:8080/; done
 ```
 
-## Architecture
+## Arquitetura
 
-The rate limiter follows a modular design:
+O limitador de requisições segue um design modular:
 
-- **Strategy Pattern**: Storage interface can be implemented by different backends
-- **Middleware Pattern**: Rate limiter can be injected into the HTTP handler chain
-- **Configuration**: Environment variables allow flexible configuration
+- **Padrão Strategy**: A interface de armazenamento pode ser implementada por diferentes backends (Redis, em memória)
+- **Padrão Middleware**: O limitador de requisições pode ser injetado na cadeia de handlers HTTP
+- **Configuração**: Variáveis de ambiente hierárquicas com notação de ponto
+- **Padrão Factory**: Cria armazenamento com base na configuração
 
-## Package Structure
+## Estrutura do Pacote
 
-- `/cmd/server`: Main application entry point
-- `/config`: Configuration loading from environment variables
-- `/internal/limiter`: Core rate limiting logic
-- `/internal/middleware`: HTTP middleware for rate limiting
-- `/internal/storage`: Storage implementations (Redis, in-memory)
-- `/test`: Test files
+```
+├── cmd/
+│   └── server/          # Ponto de entrada da aplicação
+├── config/              # Gerenciamento de configuração
+├── internal/
+│   ├── limiter/         # Lógica central de limitação de requisições
+│   ├── middleware/      # Implementação de middleware HTTP
+│   └── storage/         # Implementações de armazenamento (Redis, em memória)
+├── test/                # Arquivos de teste e exemplos de API
+├── .env                 # Configuração de ambiente com estrutura hierárquica
+└── docker-compose.yml   # Composição Docker
+```
+
+## Exemplo de Arquivo .env
+
+```env
+# Configuração do servidor
+SERVER_PORT=8080
+
+# Tipo de armazenamento (redis ou memory)
+STORAGE_TYPE=memory
+# Configuração de armazenamento Redis
+STORAGE.REDIS.URL=redis://localhost:6379/0
+
+# Configuração de armazenamento em memória
+# STORAGE.MEMORY.SIZE=1000
+
+# Configuração padrão de limitação de IP
+IP.RATE_LIMIT=1
+IP.RATE_WINDOW=1s
+IP.BLOCK_DURATION=10s
+
+# Configurações de limitação por token
+TOKEN.ACB.RATE_LIMIT=2
+TOKEN.ACB.RATE_WINDOW=1s
+TOKEN.ACB.BLOCK_DURATION=20s
+
+TOKEN.DEVWAS.RATE_LIMIT=50
+TOKEN.DEVWAS.RATE_WINDOW=1s
+TOKEN.DEVWAS.BLOCK_DURATION=1m
+
+TOKEN.ASDQWED.RATE_LIMIT=20
+TOKEN.ASDQWED.RATE_WINDOW=1s
+TOKEN.ASDQWED.BLOCK_DURATION=1m
+```
