@@ -18,3 +18,6 @@ services:
       - STORAGE_REDIS_URL=redis://redis:6379/0
       - SERVER_PORT=8080
       - STORAGE_TYPE=redis
+      - IP_RATE_LIMIT=150
+      - IP_RATE_WINDOW=1s
+      - IP_BLOCK_DURATION=5s
